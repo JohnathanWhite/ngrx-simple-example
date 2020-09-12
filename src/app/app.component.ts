@@ -1,28 +1,34 @@
 import {Component, OnInit} from '@angular/core';
-import {select, Store} from '@ngrx/store';
+import {Store} from '@ngrx/store';
 import * as fromRoot from '../store/index';
+import {START_ADD_POST, START_GET_POSTS} from '../store/app/app.actions';
 import {Observable} from 'rxjs';
-import {INCREMENT} from '../store/app/app.actions';
-
+import {Post} from '../models';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  count$: Observable<number>;
+
+  posts$: Observable<Array<Post>>;
 
   constructor(private store: Store<fromRoot.State>) {
   }
 
   ngOnInit(): void {
-    this.count$ = this.store
-      .pipe(
-        select(({app}) => app.count),
-        );
+    this.store.dispatch(START_GET_POSTS());
+    this.posts$ = this.store.select(({app}) => app.posts);
   }
 
-  increment(): void {
-    this.store.dispatch(INCREMENT());
+  addPost(): void {
+    const post: Post = {
+      userId: 1,
+      id: 5,
+      title: 'test',
+      body: 'test'
+    };
+    this.store.dispatch(START_ADD_POST({post}));
   }
+
 }
